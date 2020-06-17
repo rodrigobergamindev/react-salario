@@ -1,0 +1,10 @@
+
+.bar {
+    height: 40px; 
+    background-color: #26a69a;
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    margin-bottom: 40px;
+    margin-top: 40px;
+}

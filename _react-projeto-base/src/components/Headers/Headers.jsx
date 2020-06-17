@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import css from './header.module.css'
 
+
 export default class Header extends Component {
     handleInputChange = (event) => {
-        const newInput = event.target.value < 0  ? 0 : event.target.value
+        const newInput = event.target.value < 0 ? 0 : event.target.value 
         this.props.onChangeFilter(newInput)
     }
 
@@ -13,7 +14,6 @@ export default class Header extends Component {
             <div className={css.container}>
                 <h1>CÁLCULO DE RENDIMENTOS</h1>
                 <input
-                id="inputSalary"
                 placeholder="Informe seu salário"
                 type="number"
                 value={filter}

@@ -4,18 +4,20 @@ import css from './viewirrf.module.css'
 
 export default class ViewIRRF extends Component {
     render() {
-        const { baseIRRF, descIRRF} = this.props
+        const { baseIRRF, descIRRF, percent} = this.props
         return (
-            <div className={css.view}>
+            <div className={css.container}>
           <table>
+              <tbody>
               <tr>
-                  <th>BASE SALARIAL IRRF</th>
-                  <th>DESCONTO IRRF</th>
+                  <th className={css.viewIRRF}>FAIXA SALARIAL IRRF</th>
+                  <th className={css.viewIRRF}>DESCONTO IRRF</th>
               </tr>
               <tr>
                 <td>{formatNumber(baseIRRF)}</td>
-                <td>{formatNumber(descIRRF)}</td>
+                <td>{`${formatNumber(descIRRF)} (${percent}%)`}</td>
               </tr>
+              </tbody>
           </table>
             </div>
         )

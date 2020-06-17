@@ -4,16 +4,18 @@ import css from './viewsalary.module.css'
 
 export default class ViewSalary extends Component {
     render() {
-        const { salarioLiquido } = this.props
+        const { salarioLiquido, percent } = this.props
         return (
-            <div className={css.view}>
+            <div className={css.container}>
             <table>
+                <tbody>
               <tr>
-                  <th>SALÁRIO LÍQUIDO</th>
+                  <th className={css.viewSalary}>SALÁRIO LÍQUIDO</th>
               </tr>
               <tr>
                 <td>{formatNumber(salarioLiquido)}</td>
               </tr>
+              </tbody>
           </table>
             </div>
         )

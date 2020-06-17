@@ -3,6 +3,7 @@ import Header from './components/Headers/Headers';
 import ViewINSS from './components/viewINSS/ViewINSS';
 import ViewIRRF from './components/viewIRRF/ViewIRRF';
 import ViewSalary from './components/viewSalary/ViewSalary';
+import ProgressBar from './components/ProgressBar/ProgressBar';
 
 
 export default class App extends Component {
@@ -14,21 +15,52 @@ export default class App extends Component {
       descINSS: 0,
       baseIRRF: 0,
       descIRRF: 0,
+      percentINSS: 0,
+      percentIRRF: 0,
       salarioLiquido: 0,
-      filter: ''
+      filter: '',
+      progressBar: {
+        inss: 0,
+        irrf: 0,
+        liquido: 0
+      }
     }
   }
 
   handleChangeFilter = (newInput) => {
-    const salary = parseFloat(newInput)
-
+    const salary = parseFloat(newInput) + 0
     this.setState({
       filter: newInput
     })
-    
-    const salaryINSS = this.calculateINSS(salary)
-    const irrf = this.calculateIRRF(salaryINSS)
-    
+    const inss = this.calculateINSS(salary)
+    const irrf = this.calculateIRRF(inss.salaryWithINSS)
+
+    const bar = this.calculateBar(inss.descINSS, irrf.descIRRF, irrf.salarioLiquido)
+  }
+
+  calculateBar = (descINSS, descIRRF, salarioLiquido) => {
+    const salarioBruto = descINSS + descIRRF + salarioLiquido
+    const percentIRRF = ((descIRRF * 100) / salarioBruto).toFixed(2) 
+    const percentINSS = ((descINSS * 100) / salarioBruto).toFixed(2)
+    const liquido = ((salarioLiquido * 100) / salarioBruto).toFixed(2)
+
+    if(salarioBruto >= 0){
+      this.setState({
+        progressBar : {
+          inss: 0,
+          irrf: 0,
+          liquido
+        }
+      })
+    }
+
+    this.setState({
+      progressBar : {
+        inss: percentINSS,
+        irrf: percentIRRF,
+        liquido
+      }
+    })
   }
 
   calculateINSS = (salary) => {
@@ -40,13 +72,18 @@ export default class App extends Component {
    if(salary === 1045) {
      const baseINSS = 1045
      const salaryWithINSS = 1045
+     const descINSS = primeiraFaixa
     
      this.setState({
       baseINSS,
-      descINSS: primeiraFaixa
+      descINSS,
+      percentINSS: 7.5
     })
 
-    return salaryWithINSS
+    return {
+      salaryWithINSS,
+      descINSS
+    }
 
    }else if(salary > 1045 && salary <= 2089.60){
 
@@ -56,10 +93,14 @@ export default class App extends Component {
       
       this.setState({
         baseINSS,
-        descINSS
+        descINSS,
+        percentINSS: 9
       })
 
-      return salaryWithINSS
+      return {
+        salaryWithINSS,
+        descINSS,
+      }
 
    }else if(salary > 2089.60 && salary <= 3134.40){
       const baseINSS = 2089.61
@@ -68,10 +109,14 @@ export default class App extends Component {
       
       this.setState({
         baseINSS,
-        descINSS
+        descINSS,
+        percentINSS: 12,
       })
 
-      return salaryWithINSS
+      return {
+        salaryWithINSS,
+        descINSS
+      }
 
    }else if(salary > 3134.40 && salary <= 6101.06){
     const baseINSS = 3134.41
@@ -80,9 +125,14 @@ export default class App extends Component {
     
     this.setState({
       baseINSS,
-      descINSS
+      descINSS,
+      percentINSS: 14
     })
-    return salaryWithINSS
+    
+    return {
+      salaryWithINSS,
+      descINSS,
+    }
 
    }else if(salary > 6101.06){
     const baseINSS = 6101.06
@@ -91,30 +141,50 @@ export default class App extends Component {
     
     this.setState({
       baseINSS,
-      descINSS
+      descINSS,
+      percentINSS: 14
     })
-    return salaryWithINSS
+
+    return {
+      salaryWithINSS,
+      descINSS,
+    }
     
    }else {
     const baseINSS = 0
     const descINSS = 0
+    const salaryWithINSS = 0
     
     this.setState({
       baseINSS,
-      descINSS
+      descINSS,
+      percentINSS: 0
     })
-    return 0
+    
+    return {
+      salaryWithINSS,
+      descINSS
+    }
    }
   }
 
   calculateIRRF = (salary) => {
     
     if(salary < 1903.99){
+      const salarioLiquido = salary
+      const descIRRF = 0
+
       this.setState({
         baseIRRF: 0,
-        descIRRF: 0,
-        salarioLiquido: salary
+        descIRRF,
+        salarioLiquido,
+        percentIRRF: 0
       })
+      
+      return {
+        salarioLiquido,
+        descIRRF
+      }
       
     }else if(salary > 1903.98 && salary <= 2826.65){
       const parcelaDedutivel = 142.80
@@ -125,8 +195,15 @@ export default class App extends Component {
       this.setState({
         baseIRRF,
         descIRRF,
-        salarioLiquido
+        salarioLiquido,
+        percentIRRF: 7.5
       })
+
+      return {
+        salarioLiquido,
+        descIRRF
+      }
+
 
     }else if(salary > 2826.65 && salary <= 3751.05 ){
       const parcelaDedutivel = 354.80
@@ -137,8 +214,15 @@ export default class App extends Component {
       this.setState({
         baseIRRF,
         descIRRF,
-        salarioLiquido
+        salarioLiquido,
+        percentIRRF: 15
       })
+
+      return {
+        salarioLiquido,
+        descIRRF
+      }
+
 
     }else if(salary > 3751.05 && salary <= 4664.68) {
       const parcelaDedutivel = 636.13
@@ -149,8 +233,16 @@ export default class App extends Component {
       this.setState({
         baseIRRF,
         descIRRF,
-        salarioLiquido
+        salarioLiquido,
+        percentIRRF: 22.5
       })
+
+      return {
+        salarioLiquido,
+        descIRRF
+      }
+
+
     }else if(salary > 4664.68){
       const parcelaDedutivel = 869.36
       const baseIRRF = 4664.68
@@ -160,25 +252,22 @@ export default class App extends Component {
       this.setState({
         baseIRRF,
         descIRRF,
-        salarioLiquido
+        salarioLiquido,
+        percentIRRF: 27.5
       })
-    }else{
-      const baseIRRF = 0
-      const descIRRF = 0
-      const salarioLiquido = salary
 
-      this.setState({
-        baseIRRF,
-        descIRRF,
-        salarioLiquido
-      })
+      return {
+        salarioLiquido,
+        descIRRF
+      }
+
     }
 
   }
 
   render() {
 
-    const {baseINSS,descINSS,baseIRRF,descIRRF,salarioLiquido, filter} = this.state
+    const {baseINSS,descINSS,baseIRRF,descIRRF,salarioLiquido, filter, progressBar, percentINSS, percentIRRF} = this.state
 
     return ( 
       <div className="container">
@@ -187,13 +276,16 @@ export default class App extends Component {
         onChangeFilter = {this.handleChangeFilter}
         />
 
+        <ProgressBar inss={progressBar.inss} irrf={progressBar.irrf} liquido={progressBar.liquido}/>
       
-        <ViewINSS 
+        <ViewINSS
+        percent={percentINSS} 
         descINSS={descINSS}
         baseINSS={baseINSS}
         />
 
       <ViewIRRF
+      percent={percentIRRF}
       descIRRF={descIRRF}
       baseIRRF={baseIRRF}
       />

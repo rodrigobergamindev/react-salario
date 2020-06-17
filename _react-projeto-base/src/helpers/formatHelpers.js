@@ -1,7 +1,12 @@
-const formatter = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+const formatterCurrency = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+const formatter = Intl.NumberFormat('pt-BR')
+
 
 function formatNumber(value){
-    return formatter.format(value)
+    return formatterCurrency.format(value)
 }
 
-export { formatNumber }
+function format(value){
+    return formatter.format(value)
+}
+export { formatNumber, format }

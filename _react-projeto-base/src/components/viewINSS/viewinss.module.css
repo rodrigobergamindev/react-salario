@@ -9,8 +9,17 @@
 
 td {
     background-color: lightgray;
+    border-radius: 0%;
+    border: none;
 }
 
 th {
     background-color: #26a69a;
+    border-radius: 0%;
+    border: none;
+}
+
+.viewINSS {
+    background-color: #ff5722;
+    color: white;
 }
