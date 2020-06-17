@@ -4,7 +4,7 @@ import css from './header.module.css'
 
 export default class Header extends Component {
     handleInputChange = (event) => {
-        const newInput = event.target.value < 0 ? 0 : event.target.value 
+        const newInput = event.target.value
         this.props.onChangeFilter(newInput)
     }
 

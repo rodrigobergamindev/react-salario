@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from './components/Headers/Headers';
+import Header from './components/Header/Header';
 import ViewINSS from './components/viewINSS/ViewINSS';
 import ViewIRRF from './components/viewIRRF/ViewIRRF';
 import ViewSalary from './components/viewSalary/ViewSalary';
@@ -28,14 +28,34 @@ export default class App extends Component {
   }
 
   handleChangeFilter = (newInput) => {
-    const salary = parseFloat(newInput) + 0
+    const salary = parseFloat(newInput)
     this.setState({
       filter: newInput
     })
-    const inss = this.calculateINSS(salary)
-    const irrf = this.calculateIRRF(inss.salaryWithINSS)
 
-    const bar = this.calculateBar(inss.descINSS, irrf.descIRRF, irrf.salarioLiquido)
+    if(!Number.isNaN(salary)){
+      console.log(true)
+      const inss = this.calculateINSS(salary)
+      const irrf = this.calculateIRRF(inss.salaryWithINSS)
+      const bar = this.calculateBar(inss.descINSS, irrf.descIRRF, irrf.salarioLiquido)
+    }else {
+      this.setState({
+        baseINSS: 0,
+        descINSS: 0,
+        baseIRRF: 0,
+        descIRRF: 0,
+        percentINSS: 0,
+        percentIRRF: 0,
+        salarioLiquido: 0,
+        filter: '',
+        progressBar: {
+          inss: 0,
+          irrf: 0,
+          liquido: 0
+        }
+      })
+    }
+    
   }
 
   calculateBar = (descINSS, descIRRF, salarioLiquido) => {
@@ -54,14 +74,14 @@ export default class App extends Component {
   }
 
   calculateINSS = (salary) => {
-    const primeiraFaixa = 78.38
+    const primeiraFaixa = salary * 0.075
     const segundaFaixa = 94.01
     const terceiraFaixa = 125.38
 
 
-   if(salary === 1045) {
+   if(salary <= 1045) {
      const baseINSS = 1045
-     const salaryWithINSS = 1045
+     const salaryWithINSS = salary
      const descINSS = primeiraFaixa
     
      this.setState({
@@ -140,21 +160,6 @@ export default class App extends Component {
       descINSS,
     }
     
-   }else {
-    const baseINSS = 0
-    const descINSS = 0
-    const salaryWithINSS = 0
-    
-    this.setState({
-      baseINSS,
-      descINSS,
-      percentINSS: 0
-    })
-    
-    return {
-      salaryWithINSS,
-      descINSS
-    }
    }
   }
 
