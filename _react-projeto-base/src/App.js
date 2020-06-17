@@ -43,17 +43,6 @@ export default class App extends Component {
     const percentIRRF = ((descIRRF * 100) / salarioBruto).toFixed(2) 
     const percentINSS = ((descINSS * 100) / salarioBruto).toFixed(2)
     const liquido = ((salarioLiquido * 100) / salarioBruto).toFixed(2)
-
-    if(salarioBruto >= 0){
-      this.setState({
-        progressBar : {
-          inss: 0,
-          irrf: 0,
-          liquido
-        }
-      })
-    }
-
     this.setState({
       progressBar : {
         inss: percentINSS,
@@ -61,6 +50,7 @@ export default class App extends Component {
         liquido
       }
     })
+
   }
 
   calculateINSS = (salary) => {
