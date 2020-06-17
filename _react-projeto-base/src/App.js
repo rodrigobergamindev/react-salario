@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import Header from './components/Header/Header';
-import ViewINSS from './components/viewINSS/ViewINSS';
-import ViewIRRF from './components/viewIRRF/ViewIRRF';
-import ViewSalary from './components/viewSalary/ViewSalary';
 import ProgressBar from './components/ProgressBar/ProgressBar';
+import ShowSalary from './components/ShowSalary/ShowSalary';
 
 
 export default class App extends Component {
@@ -11,258 +9,93 @@ export default class App extends Component {
     super()
 
     this.state = {
-      baseINSS: 0,
+      faixaINSS: 0,
       descINSS: 0,
-      baseIRRF: 0,
+      faixaIRRF: 0,
       descIRRF: 0,
       percentINSS: 0,
       percentIRRF: 0,
       salarioLiquido: 0,
+      percentLiquid: 0,
       filter: '',
-      progressBar: {
-        inss: 0,
-        irrf: 0,
-        liquido: 0
-      }
     }
   }
 
   handleChangeFilter = (newInput) => {
-    const salary = parseFloat(newInput)
+    const salary = Number.isNaN(parseFloat(newInput)) === true ? 0 : parseFloat(newInput)
     this.setState({
       filter: newInput
     })
-
-    if(!Number.isNaN(salary)){
-      console.log(true)
-      const inss = this.calculateINSS(salary)
-      const irrf = this.calculateIRRF(inss.salaryWithINSS)
-      const bar = this.calculateBar(inss.descINSS, irrf.descIRRF, irrf.salarioLiquido)
-    }else {
-      this.setState({
-        baseINSS: 0,
-        descINSS: 0,
-        baseIRRF: 0,
-        descIRRF: 0,
-        percentINSS: 0,
-        percentIRRF: 0,
-        salarioLiquido: 0,
-        filter: '',
-        progressBar: {
-          inss: 0,
-          irrf: 0,
-          liquido: 0
-        }
-      })
-    }
-    
+    this.calculate(salary)
   }
 
-  calculateBar = (descINSS, descIRRF, salarioLiquido) => {
-    const salarioBruto = descINSS + descIRRF + salarioLiquido
-    const percentIRRF = ((descIRRF * 100) / salarioBruto).toFixed(2) 
-    const percentINSS = ((descINSS * 100) / salarioBruto).toFixed(2)
-    const liquido = ((salarioLiquido * 100) / salarioBruto).toFixed(2)
-    this.setState({
-      progressBar : {
-        inss: percentINSS,
-        irrf: percentIRRF,
-        liquido
-      }
-    })
+  calculate = (salary) => {
+    const percentINSS = 
+    salary === 0 ? 0 :
+    salary <= 1045 ? 0.075 : 
+    salary <= 2089.60 ? 0.09 : 
+    salary <= 3134.40 ? 0.12 : 0.14
 
-  }
-
-  calculateINSS = (salary) => {
-    const primeiraFaixa = salary * 0.075
-    const segundaFaixa = 94.01
-    const terceiraFaixa = 125.38
-
-
-   if(salary <= 1045) {
-     const baseINSS = 1045
-     const salaryWithINSS = salary
-     const descINSS = primeiraFaixa
+    const faixaINSS =
+    salary === 0 ? 0 :
+    salary <= 1045 ? 'R$ 1045' : 
+    salary <= 2089.60 ? 'R$ 1045,01 a R$ 2089,60' : 
+    salary <= 3134.40 ? 'R$ 2089.61 a R$ 3134.40' : 
+    salary <= 6101.06 ? 'R$ 3134.41 a R$ 6101.06' : 
+    salary > 6101.06 ? 'Maior que R$ 6101.06' : ''
     
-     this.setState({
-      baseINSS,
-      descINSS,
-      percentINSS: 7.5
-    })
+    const descINSS = 
+    percentINSS <= 0.075 ? salary * percentINSS : 
+    salary <= 2089.60 ? (1045 * 0.075) + (salary - 1045.01) * percentINSS : 
+    salary <= 3134.40 ? (1045 * 0.075) + ((2089.60 - 1045) * 0.09) + (salary - 2089.60) * percentINSS :
+    salary <= 6101.06 ? (1045 * 0.075) + ((2089.60 - 1045) * 0.09) + ((3134.40 - 2089.60) * 0.12) + (salary - 3134.40) * percentINSS : 713.10
 
-    return {
-      salaryWithINSS,
-      descINSS
-    }
+    const salarioParcial = salary - descINSS
 
-   }else if(salary > 1045 && salary <= 2089.60){
+    const percentIRRF =
+    salarioParcial <= 1903.98 ? 0 : 
+    salarioParcial <= 2826.65 ? 0.075 : 
+    salarioParcial <= 3751.05 ? 0.15 : 
+    salarioParcial <= 4664.68 ? 0.225 : 
+    salarioParcial > 4664.68 ?  0.275 : 0
 
-      const baseINSS = 1045.01
-      const descINSS = ((salary - 1045) * 0.09) + primeiraFaixa 
-      const salaryWithINSS = salary - descINSS
-      
-      this.setState({
-        baseINSS,
-        descINSS,
-        percentINSS: 9
-      })
+    const descIRRF = 
+    salarioParcial <= 1903.98 ? 0 : 
+    salarioParcial <= 2826.65 ? (salarioParcial * percentIRRF) - 142.80 : 
+    salarioParcial <= 3751.05 ? (salarioParcial * percentIRRF) - 354.80 : 
+    salarioParcial <= 4664.68 ? (salarioParcial * percentIRRF) - 636.13 : 
+    salarioParcial > 4664.68 ? (salarioParcial * percentIRRF) - 869.36 : salarioParcial
 
-      return {
-        salaryWithINSS,
-        descINSS,
-      }
+    const faixaIRRF = 
+    salarioParcial === 0 ? 0 :
+    salarioParcial <= 1903.98 ? 'Até R$ 1.903,98':
+    salarioParcial <= 2826.65 ? 'R$ 1.903,99 a R$ 2.826,65': 
+    salarioParcial <= 3751.05 ? 'R$ 2.826,66 a R$ 3.751,05': 
+    salarioParcial <= 4664.68 ? 'R$ 3.751,06 a R$ 4.664,68': 
+    salarioParcial > 4664.68 ? 'Acima de R$ 4.664,69': ''
+    
+    const salarioLiquido = salarioParcial === descIRRF ? salarioParcial : salarioParcial - descIRRF
 
-   }else if(salary > 2089.60 && salary <= 3134.40){
-      const baseINSS = 2089.61
-      const descINSS = ((salary - 2089.60) * 0.12) + primeiraFaixa + segundaFaixa
-      const salaryWithINSS = salary - descINSS
-      
-      this.setState({
-        baseINSS,
-        descINSS,
-        percentINSS: 12,
-      })
+    const salarioBruto = salarioLiquido + descIRRF + descINSS
 
-      return {
-        salaryWithINSS,
-        descINSS
-      }
-
-   }else if(salary > 3134.40 && salary <= 6101.06){
-    const baseINSS = 3134.41
-    const descINSS =  ((salary - 3134.40) * 0.14) + primeiraFaixa + segundaFaixa + terceiraFaixa 
-    const salaryWithINSS = salary - descINSS
+    const percentLiquid = salarioLiquido === 0 ? salarioParcial * 100 : (salarioLiquido * 100) / salarioBruto
     
     this.setState({
-      baseINSS,
+      faixaINSS,
       descINSS,
-      percentINSS: 14
-    })
-    
-    return {
-      salaryWithINSS,
-      descINSS,
-    }
-
-   }else if(salary > 6101.06){
-    const baseINSS = 6101.06
-    const descINSS = 713.10
-    const salaryWithINSS = salary - descINSS
-    
-    this.setState({
-      baseINSS,
-      descINSS,
-      percentINSS: 14
+      faixaIRRF,
+      descIRRF,
+      percentINSS,
+      percentIRRF,
+      salarioLiquido,
+      percentLiquid,
     })
 
-    return {
-      salaryWithINSS,
-      descINSS,
-    }
-    
-   }
-  }
-
-  calculateIRRF = (salary) => {
-    
-    if(salary < 1903.99){
-      const salarioLiquido = salary
-      const descIRRF = 0
-
-      this.setState({
-        baseIRRF: 0,
-        descIRRF,
-        salarioLiquido,
-        percentIRRF: 0
-      })
-      
-      return {
-        salarioLiquido,
-        descIRRF
-      }
-      
-    }else if(salary > 1903.98 && salary <= 2826.65){
-      const parcelaDedutivel = 142.80
-      const baseIRRF = 1903.99
-      const descIRRF = (salary * 0.075) - parcelaDedutivel
-      const salarioLiquido = salary - descIRRF
-
-      this.setState({
-        baseIRRF,
-        descIRRF,
-        salarioLiquido,
-        percentIRRF: 7.5
-      })
-
-      return {
-        salarioLiquido,
-        descIRRF
-      }
-
-
-    }else if(salary > 2826.65 && salary <= 3751.05 ){
-      const parcelaDedutivel = 354.80
-      const baseIRRF = 2826.65
-      const descIRRF = (salary * 0.15) - parcelaDedutivel
-      const salarioLiquido = salary - descIRRF
-
-      this.setState({
-        baseIRRF,
-        descIRRF,
-        salarioLiquido,
-        percentIRRF: 15
-      })
-
-      return {
-        salarioLiquido,
-        descIRRF
-      }
-
-
-    }else if(salary > 3751.05 && salary <= 4664.68) {
-      const parcelaDedutivel = 636.13
-      const baseIRRF = 3751.05
-      const descIRRF = (salary * 0.225) - parcelaDedutivel
-      const salarioLiquido = salary - descIRRF
-
-      this.setState({
-        baseIRRF,
-        descIRRF,
-        salarioLiquido,
-        percentIRRF: 22.5
-      })
-
-      return {
-        salarioLiquido,
-        descIRRF
-      }
-
-
-    }else if(salary > 4664.68){
-      const parcelaDedutivel = 869.36
-      const baseIRRF = 4664.68
-      const descIRRF = (salary * 0.275) - parcelaDedutivel
-      const salarioLiquido = salary - descIRRF
-
-      this.setState({
-        baseIRRF,
-        descIRRF,
-        salarioLiquido,
-        percentIRRF: 27.5
-      })
-
-      return {
-        salarioLiquido,
-        descIRRF
-      }
-
-    }
 
   }
-
   render() {
 
-    const {baseINSS,descINSS,baseIRRF,descIRRF,salarioLiquido, filter, progressBar, percentINSS, percentIRRF} = this.state
+    const {faixaINSS,descINSS,faixaIRRF,descIRRF,salarioLiquido, filter, percentINSS, percentIRRF, percentLiquid} = this.state
 
     return ( 
       <div className="container">
@@ -271,23 +104,17 @@ export default class App extends Component {
         onChangeFilter = {this.handleChangeFilter}
         />
 
-        <ProgressBar inss={progressBar.inss} irrf={progressBar.irrf} liquido={progressBar.liquido}/>
-      
-        <ViewINSS
-        percent={percentINSS} 
+        <ProgressBar inss={percentINSS} irrf={percentIRRF} liquido={percentLiquid}/>
+        <ShowSalary 
+        percentINSS={percentINSS} 
         descINSS={descINSS}
-        baseINSS={baseINSS}
+        baseINSS={faixaINSS}
+        percentIRRF={percentIRRF}
+        descIRRF={descIRRF}
+        baseIRRF={faixaIRRF}
+        salarioLiquido = {salarioLiquido}
+        percentLiquid = {percentLiquid}
         />
-
-      <ViewIRRF
-      percent={percentIRRF}
-      descIRRF={descIRRF}
-      baseIRRF={baseIRRF}
-      />
-
-      <ViewSalary
-       salarioLiquido = {salarioLiquido}
-       />
 
 
       </div>
