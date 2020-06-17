@@ -13,11 +13,12 @@ export default class Header extends Component {
         return (
             <div className={css.container}>
                 <h1>CÁLCULO DE RENDIMENTOS</h1>
+                <label className="active">Salário Bruto</label>  
                 <input
-                placeholder="Informe seu salário"
+                id="inputNumber"
                 type="number"
                 value={filter}
-                onChange= {this.handleInputChange}/>
+                onChange= {this.handleInputChange}/>   
             </div>
         )
     }

@@ -10,23 +10,23 @@ export default class ShowSalary extends Component {
               <table className={css.tableView}>
               <tbody>
               <tr>
-                    <th>FAIXA SALARIAL INSS</th>
-                    <th>DESCONTO INSS</th>
+                    <th style={{color: '#ff5722'}}>FAIXA SALARIAL INSS</th>
+                    <th style={{color: '#ff5722'}}>DESCONTO INSS</th>
               </tr>
               <tr>
                     <td>{baseINSS}</td>
                     <td>{`${formatNumber(descINSS)} (${format(percentINSS * 100)}%)`}</td>
               </tr>
                 <tr>
-                    <th>FAIXA SALARIAL IRRF</th>
-                    <th> DESCONTO DO IRRF</th>
+                    <th style={{color: '#7c4dff'}}>FAIXA SALARIAL IRRF</th>
+                    <th style={{color: '#7c4dff'}}> DESCONTO DO IRRF</th>
                 </tr>
               <tr>
                     <td>{baseIRRF}</td>
                     <td>{`${formatNumber(descIRRF)} (${format(percentIRRF * 100)}%)`}</td>
               </tr>
               <tr>
-                    <th scope="row">SALÁRIO LIQUIDO</th>
+                    <th scope="row" style={{color:'#26a69a'}}>SALÁRIO LIQUIDO</th>
                     <td>{`${formatNumber(salarioLiquido)} (${format(percentLiquid)}%)`}</td>
               </tr>
               </tbody>
